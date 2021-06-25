@@ -2,17 +2,19 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Pickl
 from telegram.utils import helpers
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 import os
+from dotenv import load_dotenv
 import psycopg2
 import random
-from DBManagement import NEWENTRY, GETREFERRER, UPDATE_NOOFREF
+from DBManagement import NEWENTRY, GETREFERRER, UPDATE_NOOFREF, GETNOOFREF
 
+load_dotenv()
 # Postgresql stuff
 
-DATABASE_URL = 'postgres://fqycgnmwwgnjbo:e3821732256ab4b1e264ca215e8ad3de6d4c10747d6886c87613db4ebb9b1b18@ec2-54-160-7-200.compute-1.amazonaws.com:5432/d5bvg12omia5dp'
+DATABASE_URL = os.environ.get('DATABASE_URL')
 con = psycopg2.connect(DATABASE_URL, sslmode='require')
 cur = con.cursor()
 
-TELEGRAM_BOT_TOKEN = '1867548473:AAGDAfXzNnDQKN4afpheLhFtSgVBjln1Bdg'
+TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN')
 
 
 def start(update: Update, context: CallbackContext):
