@@ -89,6 +89,24 @@ def username(update: Update, context: CallbackContext):
     )
 
 
+def button(update, context):
+    query = update.callback_query
+    query.answer()
+    choice = query.data
+    user = query.from_user
+    userid = user.id
+    query.message.edit_reply_markup(
+        reply_markup=InlineKeyboardMarkup([])
+    )
+    if choice == '1':
+        query.message.reply_text("Fill up the form and use the same userid so that we can identify you")
+        query.message.reply_text(
+            "Copy the id below as your identifier so that the order can be matched to you")
+        query.message.reply_text(userid)
+    else:
+        text = "Redirect to Preorder Function"
+        query.message.reply_text(text)
+
 
 
 
