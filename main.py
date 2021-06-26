@@ -60,18 +60,33 @@ def referral(update: Update, context: CallbackContext):
     bot = context.bot
     reflink = helpers.create_deep_linked_url(bot.username, user_id)
     linkbeg = "https://t.me/share/url?url="
-    newreflink = linkbeg + reflink
+    newreflink = linkbeg + reflink + "\nUse this link to sign up and get your own digital profile!"
     msg = "You have referred a total of {} people".format(Noofref)
     update.message.reply_text(msg)
     reply_buttons = InlineKeyboardMarkup([
         [InlineKeyboardButton("Forward", url=newreflink)],
     ])
     update.message.reply_text(
-        f'Click button to choose chats to forward it to',
+        f'Choose chats to forward your referral link to',
         reply_markup=reply_buttons
     )
 
-
+def username(update: Update, context: CallbackContext):
+    user = update.message.from_user
+    user_id = str(user.id)
+    username = user.username
+    message = "Do you want to use the same username as your Telegram handle?\n *{}* ".format(username)
+    update.message.reply_text(message, parse_mode="Markdown")
+    reply_buttons = InlineKeyboardMarkup([
+        [InlineKeyboardButton("Yes ✅", callback_data='1')],
+        [
+            InlineKeyboardButton("No ❌", callback_data='2'),
+        ]
+    ])
+    update.message.reply_text(
+        f'Please choose an option:',
+        reply_markup=reply_buttons
+    )
 
 
 
@@ -109,6 +124,8 @@ def botmain():
     dp = updater.dispatcher
     dp.add_handler(CommandHandler('start', start))
     dp.add_handler(CommandHandler('referral', referral))
+    dp.add_handler(CommandHandler('username', username))
+    dp.add_handler(CallbackQueryHandler(button))
 
 
     updater.start_polling()
