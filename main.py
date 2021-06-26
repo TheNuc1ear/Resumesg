@@ -31,7 +31,7 @@ def start(update: Update, context: CallbackContext):
     if len(checkUserid) == 0:
         print("New User")
         NEWENTRY(user_id, username, user_firstname, REFCODE, referrerid, 0)
-        greeting = "Hello {}! Welcome to ResumeSG Bot".format(user_firstname)
+        greeting = "Hello {}! Welcome to ResumeSG Bot.\nUse /referral for more info on your referrals.\nUse /form to fill up our form and place an order".format(user_firstname)
         update.message.reply_text(greeting)
         REFERRER_username = GETREFERRER(referrerid)
         REFERRER_username = str(REFERRER_username[0])
@@ -47,7 +47,7 @@ def start(update: Update, context: CallbackContext):
         update.message.reply_text(chatmessage)
     else:
         print("Old User")
-        greeting = "Welcome back {}. \nUse /referral for more info on your referrals".format(
+        greeting = "Welcome back {}.\nUse /referral for more info on your referrals.\nUse /form to fill up our form and place an order ".format(
             user_firstname)
         update.message.reply_text(greeting)
 
@@ -61,8 +61,13 @@ def referral(update: Update, context: CallbackContext):
     reflink = helpers.create_deep_linked_url(bot.username, user_id)
     linkbeg = "https://t.me/share/url?url="
     newreflink = linkbeg + reflink + "\nUse this link to sign up and get your own digital profile!"
-    msg = "You have referred a total of {} people".format(Noofref)
-    update.message.reply_text(msg)
+    msg = "You have referred a total of {} people.\n You'll prob get cashback or some shit if you refer 5 people and they buy our service. \n_bopz_ ".format(Noofref)
+    update.message.reply_text(msg, parse_mode="Markdown")
+    user_sticker = 'CAACAgQAAxkBAAECfB1g12GgGJKASDuZ-MizpHlaben5BgACvgsAArxBaFEPMnV3RgEmxSAE'
+    context.bot.sendSticker(
+        chat_id=update.effective_chat.id,
+        sticker=user_sticker
+    )
     reply_buttons = InlineKeyboardMarkup([
         [InlineKeyboardButton("Forward", url=newreflink)],
     ])
@@ -71,41 +76,21 @@ def referral(update: Update, context: CallbackContext):
         reply_markup=reply_buttons
     )
 
-def username(update: Update, context: CallbackContext):
+def form(update: Update, context: CallbackContext):
     user = update.message.from_user
     user_id = str(user.id)
     username = user.username
-    message = "Do you want to use the same username as your Telegram handle?\n *{}* ".format(username)
-    update.message.reply_text(message, parse_mode="Markdown")
+    formurl = "https://docs.google.com/forms/d/e/1FAIpQLSdvzQQFwjq3c90K0F1kRik3lPn6GERhMF7km_zRl3ANW_pvbQ/viewform?usp=pp_url&entry.223422261=" + str(username)
     reply_buttons = InlineKeyboardMarkup([
-        [InlineKeyboardButton("Yes ✅", callback_data='1')],
-        [
-            InlineKeyboardButton("No ❌", callback_data='2'),
-        ]
+        [InlineKeyboardButton("Fill me up NOW", url=formurl)],
     ])
     update.message.reply_text(
-        f'Please choose an option:',
-        reply_markup=reply_buttons
+        "Fill up the form to place an order".format(username),
+        reply_markup=reply_buttons,
+        parse_mode="html"
     )
 
 
-def button(update, context):
-    query = update.callback_query
-    query.answer()
-    choice = query.data
-    user = query.from_user
-    userid = user.id
-    query.message.edit_reply_markup(
-        reply_markup=InlineKeyboardMarkup([])
-    )
-    if choice == '1':
-        query.message.reply_text("Fill up the form and use the same userid so that we can identify you")
-        query.message.reply_text(
-            "Copy the id below as your identifier so that the order can be matched to you")
-        query.message.reply_text(userid)
-    else:
-        text = "Redirect to Preorder Function"
-        query.message.reply_text(text)
 
 
 
@@ -142,8 +127,7 @@ def botmain():
     dp = updater.dispatcher
     dp.add_handler(CommandHandler('start', start))
     dp.add_handler(CommandHandler('referral', referral))
-    dp.add_handler(CommandHandler('username', username))
-    dp.add_handler(CallbackQueryHandler(button))
+    dp.add_handler(CommandHandler('form', form))
 
 
     updater.start_polling()
